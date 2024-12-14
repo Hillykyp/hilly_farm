@@ -1,0 +1,31 @@
+{% extends 'farm_app/base.html' %}
+
+{% block content %}
+<div class="container">
+    <article class="blog-post">
+        <header class="text-center mb-4">
+            <h1 class="display-4">{{ post.title }}</h1>
+            <div class="text-muted">
+                Published on {{ post.created_at|date:"F d, Y" }}
+                {% if post.updated_at != post.created_at %}
+                | Updated on {{ post.updated_at|date:"F d, Y" }}
+                {% endif %}
+            </div>
+        </header>
+
+        {% if post.image %}
+        <div class="text-center mb-4">
+            <img src="{{ post.image.url }}" class="img-fluid rounded" alt="{{ post.title }}">
+        </div>
+        {% endif %}
+
+        <div class="blog-content">
+            {{ post.content|linebreaks }}
+        </div>
+    </article>
+
+    <div class="text-center mt-4">
+        <a href="{% url 'blog-list' %}" class="btn btn-success">Back to Blog</a>
+    </div>
+</div>
+{% endblock %}

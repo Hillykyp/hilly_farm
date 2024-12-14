@@ -1,0 +1,91 @@
+{% extends 'farm_app/base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            {% if product.image %}
+            <img src="{{ product.image.url }}" class="img-fluid rounded" alt="{{ product.name }}">
+            {% endif %}
+        </div>
+        <div class="col-md-6">
+            <h1 class="mb-3">{{ product.name }}</h1>
+            <p class="lead">{{ product.description }}</p>
+            <p class="h3 text-success mb-3">${{ product.price }}</p>
+            <p>
+                <strong>Category:</strong> {{ product.category.name }}<br>
+                <strong>Stock:</strong> <span id="available-stock">{{ product.stock }}</span> units available
+            </p>
+            
+            <form id="add-to-cart-form" class="mb-4">
+                <div class="row align-items-center">
+                    <div class="col-auto">
+                        <div class="input-group">
+                            <button type="button" class="btn btn-outline-secondary" onclick="updateQuantity(-1)">-</button>
+                            <input type="number" id="quantity" name="quantity" class="form-control text-center" value="1" min="1" max="{{ product.stock }}" style="width: 80px;">
+                            <button type="button" class="btn btn-outline-secondary" onclick="updateQuantity(1)">+</button>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <button type="submit" class="btn btn-success btn-lg" {% if product.stock < 1 %}disabled{% endif %}>
+                            {% if product.stock < 1 %}Out of Stock{% else %}Add to Cart{% endif %}
+                        </button>
+                    </div>
+                </div>
+            </form>
+            
+            <div id="cart-message" class="alert" style="display: none;"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function updateQuantity(change) {
+    const input = document.getElementById('quantity');
+    const newValue = parseInt(input.value) + change;
+    if (newValue >= 1 && newValue <= {{ product.stock }}) {
+        input.value = newValue;
+    }
+}
+
+document.getElementById('add-to-cart-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const quantity = document.getElementById('quantity').value;
+    const messageDiv = document.getElementById('cart-message');
+    
+    fetch('{% url "add-to-cart" product.id %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: `quantity=${quantity}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            messageDiv.className = 'alert alert-danger';
+            messageDiv.textContent = data.error;
+        } else {
+            messageDiv.className = 'alert alert-success';
+            messageDiv.textContent = data.message;
+            
+            // Update cart count in navbar if it exists
+            const cartCount = document.getElementById('cart-count');
+            if (cartCount) {
+                cartCount.textContent = data.cart_items;
+            }
+        }
+        messageDiv.style.display = 'block';
+        
+        // Hide message after 3 seconds
+        setTimeout(() => {
+            messageDiv.style.display = 'none';
+        }, 3000);
+    });
+});
+</script>
+{% endblock %}

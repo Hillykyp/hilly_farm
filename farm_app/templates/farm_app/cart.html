@@ -1,0 +1,145 @@
+{% extends 'farm_app/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Shopping Cart</h1>
+    
+    {% if cart.items.all %}
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    {% for item in cart.items.all %}
+                    <div class="cart-item mb-3 pb-3 border-bottom">
+                        <div class="row align-items-center">
+                            <div class="col-md-2">
+                                {% if item.product.image %}
+                                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="img-fluid rounded">
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <h5>{{ item.product.name }}</h5>
+                                <p class="text-muted mb-0">{{ item.product.category.name }}</p>
+                            </div>
+                            <div class="col-md-2">
+                                <span class="product-price">${{ item.product.price }}</span>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="quantity-control">
+                                    <input type="number" 
+                                           class="form-control quantity-input" 
+                                           value="{{ item.quantity }}"
+                                           min="1"
+                                           max="{{ item.product.stock }}"
+                                           data-product-id="{{ item.product.id }}">
+                                </div>
+                            </div>
+                            <div class="col-md-2 text-end">
+                                <button class="btn btn-sm btn-danger remove-item" 
+                                        data-product-id="{{ item.product.id }}">
+                                    Remove
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Order Summary</h5>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Items ({{ cart.get_total_items }})</span>
+                        <span>${{ cart.get_total }}</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-3">
+                        <strong>Total</strong>
+                        <strong>${{ cart.get_total }}</strong>
+                    </div>
+                    <button class="btn btn-success w-100">Proceed to Checkout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center">
+        <p>Your cart is empty</p>
+        <a href="{% url 'products' %}" class="btn btn-success">Continue Shopping</a>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle quantity changes
+    document.querySelectorAll('.quantity-input').forEach(input => {
+        input.addEventListener('change', function() {
+            const productId = this.dataset.productId;
+            const quantity = this.value;
+            
+            fetch(`/cart/update/${productId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: `quantity=${quantity}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                    location.reload();
+                } else {
+                    location.reload();
+                }
+            });
+        });
+    });
+
+    // Handle remove buttons
+    document.querySelectorAll('.remove-item').forEach(button => {
+        button.addEventListener('click', function() {
+            const productId = this.dataset.productId;
+            
+            fetch(`/cart/remove/${productId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    location.reload();
+                }
+            });
+        });
+    });
+
+    // Function to get CSRF token from cookies
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+</script>
+{% endblock %}

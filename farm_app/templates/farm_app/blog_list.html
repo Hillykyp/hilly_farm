@@ -1,0 +1,84 @@
+{% extends 'farm_app/base.html' %}
+
+{% block content %}
+<div class="container">
+    <!-- Featured Posts Section -->
+    {% if featured_posts %}
+    <section class="mb-5">
+        <h2 class="text-center mb-4">Featured Posts</h2>
+        <div class="row">
+            {% for post in featured_posts %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    {% if post.image %}
+                    <img src="{{ post.image.url }}" class="card-img-top" alt="{{ post.title }}">
+                    {% endif %}
+                    <div class="card-body text-center">
+                        <h5 class="card-title">{{ post.title }}</h5>
+                        <p class="card-text">{{ post.excerpt }}</p>
+                        <a href="{{ post.get_absolute_url }}" class="btn btn-success">Read More</a>
+                    </div>
+                    <div class="card-footer text-muted text-center">
+                        {{ post.created_at|date:"F d, Y" }}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- All Posts Section -->
+    <section>
+        <h2 class="text-center mb-4">Latest Blog Posts</h2>
+        <div class="row">
+            {% for post in posts %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    {% if post.image %}
+                    <img src="{{ post.image.url }}" class="card-img-top" alt="{{ post.title }}">
+                    {% endif %}
+                    <div class="card-body text-center">
+                        <h5 class="card-title">{{ post.title }}</h5>
+                        <p class="card-text">{{ post.excerpt }}</p>
+                        <a href="{{ post.get_absolute_url }}" class="btn btn-success">Read More</a>
+                    </div>
+                    <div class="card-footer text-muted text-center">
+                        {{ post.created_at|date:"F d, Y" }}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center">
+                <p>No blog posts available yet.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+            </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+            <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            </li>
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}

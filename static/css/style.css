@@ -1,0 +1,126 @@
+/* Custom styles for Farm Fresh website */
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    padding-top: 60px;
+    background-color: #f8f9fa;
+}
+
+.navbar {
+    padding: 1rem 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.navbar-brand {
+    padding: 0;
+}
+
+.navbar-brand img {
+    max-height: 40px;
+    width: auto;
+}
+
+.nav-link {
+    position: relative;
+    padding: 0.5rem 1rem !important;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 50%;
+    background-color: #4CAF50;
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+.card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border: none;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.card-img-top {
+    height: 200px;
+    object-fit: cover;
+    transition: transform 0.3s;
+}
+
+.card:hover .card-img-top {
+    transform: scale(1.05);
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.section-title {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.jumbotron {
+    background: linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)), 
+                url('/static/images/farm-background.jpg') center/cover;
+    padding: 4rem 2rem;
+    border-radius: 15px;
+    margin-bottom: 2rem;
+}
+
+.btn-success {
+    background-color: #28a745;
+    border: none;
+    padding: 0.5rem 1.5rem;
+    transition: all 0.3s;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.product-price {
+    color: #28a745;
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+.product-category {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+footer {
+    margin-top: 3rem;
+    background-color: #343a40;
+    color: white;
+    padding: 2rem 0;
+}
+
+.blog-post {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.blog-content {
+    line-height: 1.8;
+    font-size: 1.1rem;
+}
